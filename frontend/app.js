@@ -4,12 +4,9 @@ function goToScreen(screenId) {
     s.classList.remove('active');
   });
 
-  // small timeout ensures CSS transition triggers
   setTimeout(() => {
     const targetScreen = document.getElementById(screenId);
     targetScreen.classList.add('active');
-
-    // If it's the output screen, auto-play the speech
     if (screenId === 'output') {
       playSpeech();
     }
@@ -24,7 +21,7 @@ function sendToBackend(command) {
   })
   .then(res => res.json())
   .then(data => {
-    console.log("Backend response:", data); // debug in console
+    console.log("Backend response:", data); 
     if (data.prediction) {
       document.getElementById("outputText").innerText = data.prediction;
     } else {
@@ -42,17 +39,18 @@ function sendToBackend(command) {
 
 function showOutput(text) {
   document.getElementById('outputText').innerText = text;
-  goToScreen('output');  // playSpeech() will be triggered here automatically
+  goToScreen('output'); 
 }
 
 function playSpeech() {
   let text = document.getElementById('outputText').innerText;
 
-  // Stop any ongoing speech before starting new
+
   speechSynthesis.cancel();
 
   if (text.trim() !== "") {
     let speech = new SpeechSynthesisUtterance(text);
     speechSynthesis.speak(speech);
   }
+
 }
