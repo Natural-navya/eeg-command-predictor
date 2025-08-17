@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NeuroSpeak</title>
+</head>
+<body>
+    <h1>NeuroSpeak Commands</h1>
+
+    <!-- Buttons for each command -->
+    <button onclick="sendCommand('left')">LEFT</button>
+    <button onclick="sendCommand('right')">RIGHT</button>
+    <button onclick="sendCommand('up')">UP</button>
+    <button onclick="sendCommand('down')">DOWN</button>
+    <button onclick="sendCommand('start')">START</button>
+    <button onclick="sendCommand('stop')">STOP</button>
+    <button onclick="sendCommand('select')">SELECT</button>
+
+    <p id="output">Prediction will appear here</p>
+
+    <script>
+        // Example EEG signals for demo
+        const eegSignals = {
+            left: [0.12, 0.35, 0.48],  // replace with actual EEG data
+            right: [0.23, 0.15, 0.67],
+            up: [0.11, 0.44, 0.22],
+            down: [0.55, 0.32, 0.12],
+            start: [0.33, 0.21, 0.44],
+            stop: [0.22, 0.33, 0.11],
+            select: [0.41, 0.54, 0.65]
+        };
+
+        async function sendCommand(command) {
+            const response = await fetch('http://127.0.0.1:5000/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ eeg_signal: eegSignals[command] })
+            });
+
+            const data = await response.json();
+            document.getElementById('output').innerText = data.command;
+        }
+    </script>
+</body>
+</html>
