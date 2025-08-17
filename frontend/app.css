@@ -96,7 +96,7 @@ button:hover {
   background: #333; 
 }
 
-/* Menu grid layout */
+
 .menu-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -114,4 +114,5 @@ button:hover {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
 }
