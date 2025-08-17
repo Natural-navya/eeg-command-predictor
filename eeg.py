@@ -1,0 +1,74 @@
+import tkinter as tk
+import numpy as np
+import joblib
+import pyttsx3
+import random
+import threading
+
+# Initialize TTS
+engine = pyttsx3.init()
+
+# Load trained model
+model_path = "C:\eegsignals\backend\model"
+clf = joblib.load(model_path)
+
+# Folder with command feature files
+command_dir = "C:\eegsignals\backend\newcommands"
+command_files = [
+    "need_water.npy", "hungry.npy", "yes.npy", 
+    "no.npy", "medicines.npy", "care_taker.npy", "other.npy"
+]
+
+# Map numeric labels to commands
+commands = {
+    0: "Need Water",
+    1: "Hungry",
+    2: "Yes",
+    3: "No",
+    4: "Medicines",
+    5: "Care Taker",
+    6: "Need help"
+}
+
+# Function to speak in a thread
+def speak_text(text):
+    engine.say(text)
+    engine.runAndWait()
+
+# Stop speaking function
+def stop_speaking():
+    engine.stop()
+
+# Predict a random command
+def predict_random_command():
+    try:
+        file_name = random.choice(command_files)
+        file_path = f"{command_dir}/{file_name}"
+        
+        X = np.load(file_path)
+        sample = X[random.randint(0, X.shape[0]-1)].reshape(1, -1)
+        
+        pred_label = clf.predict(sample)[0]
+        result_text = commands[pred_label]
+        
+        result_label.config(text=f"Predicted Command: {result_text}")
+        
+        # Run TTS in a separate thread
+        threading.Thread(target=speak_text, args=(result_text,), daemon=True).start()
+        
+    except Exception as e:
+        result_label.config(text=f"Error: {str(e)}")
+
+# GUI setup
+root = tk.Tk()
+root.title("EEG Command Predictor")
+root.geometry("400x250")
+
+tk.Label(root, text="EEG Command Predictor", font=("Arial", 16)).pack(pady=10)
+tk.Button(root, text="Predict Random Command", command=predict_random_command).pack(pady=10)
+tk.Button(root, text="Stop Voice", command=stop_speaking).pack(pady=10)
+
+result_label = tk.Label(root, text="Predicted Command: None", font=("Arial", 12))
+result_label.pack(pady=20)
+
+root.mainloop()

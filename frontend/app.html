@@ -1,45 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>NeuroSpeak</title>
+  <meta charset="UTF-8">
+  <title>NeuroSpeak</title>
+  <link rel="stylesheet" href="app.css">
 </head>
 <body>
-    <h1>NeuroSpeak Commands</h1>
+  <div class="container">
 
-    <!-- Buttons for each command -->
-    <button onclick="sendCommand('left')">LEFT</button>
-    <button onclick="sendCommand('right')">RIGHT</button>
-    <button onclick="sendCommand('up')">UP</button>
-    <button onclick="sendCommand('down')">DOWN</button>
-    <button onclick="sendCommand('start')">START</button>
-    <button onclick="sendCommand('stop')">STOP</button>
-    <button onclick="sendCommand('select')">SELECT</button>
+    <!-- Home Screen -->
+    <div id="home" class="screen active">
+      <h1>NeuroSpeaks</h1>
+      <button>⚡ Connect EEG</button>
+      <button class="secondary" onclick="goToScreen('menu')">🎮 Use Demo Mode</button>
+      <p>Powered by EEG Signal AI</p>
+    </div>
 
-    <p id="output">Prediction will appear here</p>
+    <!-- Menu Screen -->
+   <div id="menu" class="screen">
+  <h1>Command Menu</h1>
+  <div class="menu-grid">
+    <button class="medicine" onclick="sendToBackend('Medicine')">Medicine 💊</button>
+    <button class="help" onclick="sendToBackend('Need Help')">Need Help 🚨</button>
+    <button class="hungry" onclick="sendToBackend('Hungry')">Hungry 🍽️</button>
+    <button class="call" onclick="sendToBackend('Call Caregiver')">Call Caregiver 📞</button>
+    <button class="water" onclick="sendToBackend('Need Water')">Need Water 💧</button>
+    <button class="yes" onclick="sendToBackend('Yes')">Yes ✅</button>
+    <button class="no" onclick="sendToBackend('No')">No ❌</button>
 
-    <script>
-        // Example EEG signals for demo
-        const eegSignals = {
-            left: [0.12, 0.35, 0.48],  // replace with actual EEG data
-            right: [0.23, 0.15, 0.67],
-            up: [0.11, 0.44, 0.22],
-            down: [0.55, 0.32, 0.12],
-            start: [0.33, 0.21, 0.44],
-            stop: [0.22, 0.33, 0.11],
-            select: [0.41, 0.54, 0.65]
-        };
+  </div>
+  <button onclick="goToScreen('home')">⬅ Back to home</button>
+</div>
 
-        async function sendCommand(command) {
-            const response = await fetch('http://127.0.0.1:5000/predict', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ eeg_signal: eegSignals[command] })
-            });
+       <!-- Output Screen -->
+<div id="output" class="screen">
+  <h1>Output</h1>
+  <div class="output-box" id="outputText">...</div>
+  <button class="secondary" onclick="playSpeech()">🔊 Play</button>
+  <button class="back"  onclick="goToScreen('menu')">⬅ Back to Menu</button>
+</div>
 
-            const data = await response.json();
-            document.getElementById('output').innerText = data.command;
-        }
-    </script>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>

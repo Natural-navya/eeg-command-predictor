@@ -1,43 +1,48 @@
 from flask import Flask, request, jsonify
-import os
-import joblib
-import numpy as np
-import pyttsx3
 from flask_cors import CORS
+import joblib
+import os
 
+# Flask setup
 app = Flask(__name__)
-CORS(app)  # allow cross-origin requests from frontend
+CORS(app)
 
-# Load the EEG model
-BASE_DIR = os.getcwd()  # safer in VS Code terminal
-model_path = os.path.join(BASE_DIR, 'model', 'model.pkl')
-model = joblib.load(model_path)
-print("Model loaded successfully!")
+# Load model (adjust path if needed)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "model", "model.pkl")
 
-# Initialize text-to-speech engine
-engine = pyttsx3.init()
+model = joblib.load(MODEL_PATH)
 
-@app.route('/predict', methods=['POST'])
+# List of commands corresponding to classes
+COMMANDS = ["Need Help", "Medicine", "Hungry", "Call Caregiver", "Need Water", "Yes", "No"]
+
+@app.route("/predict", methods=["POST"])
 def predict():
     data = request.get_json()
-    
-    if 'eeg_signal' not in data:
-        return jsonify({"error": "No EEG signal provided"}), 400
-    
-    eeg_signal = np.array(data['eeg_signal']).reshape(1, -1)  # reshape for model
-    
-    # Predict command
-    prediction = model.predict(eeg_signal)
-    command = str(prediction[0])  # convert to string if needed
-    
-    # Speak the command
-    engine.say(command)
-    engine.runAndWait()
-    
-    # Return JSON response
-    return jsonify({"command": command})
+
+    # In real use-case, you'd get EEG features instead of just command text
+    command = data.get("command", None)
+
+    if not command:
+        return jsonify({"error": "No command received"}), 400
+
+    # If model expects some input, you’d replace this part with preprocessing
+    # For now, let's just simulate prediction
+    # Example: simulate class index from button press
+    try:
+        class_idx = COMMANDS.index(command)
+    except ValueError:
+        return jsonify({"error": "Invalid command"}), 400
+
+    # Model prediction (dummy example: just echo index)
+    # Replace with: prediction = model.predict([features])[0]
+    prediction = COMMANDS[class_idx]
+
+    # Print in terminal
+    print(f"✅ Predicted: {prediction}")
+
+    return jsonify({"prediction": prediction})
+
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
